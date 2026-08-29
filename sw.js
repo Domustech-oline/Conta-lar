@@ -1,4 +1,4 @@
-const CACHE = "contaslar-v3";
+const CACHE = "contaslar-v4";
 const ASSETS = [
   "./index.html",
   "./manifest.json",
@@ -22,6 +22,18 @@ self.addEventListener("activate", (e) => {
 
 self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET") return;
+
+  // Nunca cachear chamadas à planilha (Google Apps Script) — esses dados
+  // mudam o tempo todo e precisam vir sempre direto da rede, senão o app
+  // mostra valores antigos depois de editar algo e recarregar a página.
+  const url = e.request.url;
+  if (url.includes("script.google.com") || url.includes("script.googleusercontent.com")) {
+    e.respondWith(fetch(e.request));
+    return;
+  }
+
+  // Arquivos estáticos do próprio app: cache-first com atualização em
+  // segundo plano (stale-while-revalidate).
   e.respondWith(
     caches.match(e.request).then((cached) => {
       const fetchPromise = fetch(e.request)
@@ -37,5 +49,3 @@ self.addEventListener("fetch", (e) => {
     })
   );
 });
-
-
