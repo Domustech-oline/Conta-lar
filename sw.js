@@ -1,4 +1,4 @@
-const CACHE = "contaslar-v3";
+const CACHE = "contaslar-v4";
 const ASSETS = [
   "./index.html",
   "./manifest.json",
